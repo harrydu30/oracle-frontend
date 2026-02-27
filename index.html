@@ -31,9 +31,40 @@
       overflow-x:hidden;
     }
 
-    /* Subtle scanline animation (Animation #1) */
-    .scanline{
+    /* ===== Animation: floating neon blobs (light + tasty) ===== */
+    .blobs{
       position:fixed; inset:0; pointer-events:none; z-index:0;
+      filter: blur(35px);
+      opacity:.55;
+    }
+    .blob{
+      position:absolute; width:380px; height:380px; border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,61,247,.7), rgba(255,61,247,0) 60%);
+      animation: floaty 16s ease-in-out infinite;
+      mix-blend-mode: screen;
+    }
+    .blob.b{
+      width:420px; height:420px;
+      background: radial-gradient(circle at 30% 30%, rgba(42,245,255,.55), rgba(42,245,255,0) 60%);
+      animation-duration: 19s;
+      animation-delay: -4s;
+    }
+    .blob.c{
+      width:300px; height:300px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,211,106,.45), rgba(255,211,106,0) 60%);
+      animation-duration: 21s;
+      animation-delay: -9s;
+    }
+    @keyframes floaty{
+      0%   { transform: translate(-40px, -20px) scale(1); }
+      35%  { transform: translate(120px, 70px) scale(1.08); }
+      70%  { transform: translate(-10px, 140px) scale(0.95); }
+      100% { transform: translate(-40px, -20px) scale(1); }
+    }
+
+    /* Subtle scanline animation */
+    .scanline{
+      position:fixed; inset:0; pointer-events:none; z-index:1;
       background:
         repeating-linear-gradient(
           to bottom,
@@ -51,7 +82,7 @@
       100%{transform:translateY(14px)}
     }
 
-    .shell{max-width:1200px;margin:16px auto;padding:16px;position:relative;z-index:1}
+    .shell{max-width:1200px;margin:16px auto;padding:16px;position:relative;z-index:2}
     .header{
       display:flex;align-items:center;justify-content:space-between;gap:12px;
       padding:14px 16px;border:1px solid var(--border);border-radius:30px;
@@ -60,7 +91,26 @@
         radial-gradient(circle at 100% 0, rgba(42, 245, 255, 0.14), transparent 55%),
         linear-gradient(135deg, rgba(10, 12, 28, 0.96), rgba(2, 4, 16, 0.98));
       box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
     }
+    /* tiny shimmer on header */
+    .header::after{
+      content:"";
+      position:absolute; inset:-60%;
+      background: linear-gradient(90deg, transparent 40%, rgba(255,255,255,.08) 50%, transparent 60%);
+      transform: rotate(18deg) translateX(-40%);
+      animation: shimmer 7.5s ease-in-out infinite;
+      pointer-events:none;
+      mix-blend-mode: overlay;
+    }
+    @keyframes shimmer{
+      0%{ transform: rotate(18deg) translateX(-60%); opacity:.0 }
+      25%{ opacity:.25 }
+      50%{ transform: rotate(18deg) translateX(60%); opacity:.0 }
+      100%{ transform: rotate(18deg) translateX(60%); opacity:.0 }
+    }
+
     .title{
       font-weight:900;letter-spacing:.10em;text-transform:uppercase;
       background: linear-gradient(120deg, #ff9bf7 0%, #ffffff 30%, #2af5ff 60%, #ffef9f 100%);
@@ -68,9 +118,8 @@
       text-shadow:0 0 10px rgba(255,61,247,.8), 0 0 20px rgba(42,245,255,.7);
     }
     .sub{color:var(--muted);font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;margin-top:4px}
-    .right{
-      display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end
-    }
+    .right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+
     .pill{
       padding:7px 12px;border-radius:999px;border:1px solid var(--border);
       color:var(--muted);background:rgba(0,0,0,.35);
@@ -89,6 +138,8 @@
     }
     .dot.ok{background:var(--ok); box-shadow:0 0 12px rgba(42,250,155,.7)}
     .dot.bad{background:var(--bad); box-shadow:0 0 12px rgba(255,75,107,.7)}
+    .dot.warn{background:var(--warn); box-shadow:0 0 12px rgba(255,211,106,.75)}
+
     .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-top:14px}
     @media(max-width:980px){.grid{grid-template-columns:1fr}}
     .card{
@@ -125,6 +176,7 @@
       background: linear-gradient(120deg, #ff3df7, #ff9bf7, #2af5ff);
       color:#050712; box-shadow:0 0 12px rgba(255,61,247,.7);
       transition:.16s ease;
+      display:inline-flex; align-items:center; gap:10px;
     }
     .btn:hover{transform:translateY(-1px); box-shadow:0 0 18px rgba(255,61,247,.9)}
     .btn.secondary{
@@ -143,15 +195,24 @@
     }
     .result.show{transform:translateY(0); opacity:1}
 
-    /* Animation #2 : pulse glow on update */
-    .glow{
-      animation: glow .7s ease;
-    }
+    /* pulse glow on update */
+    .glow{ animation: glow .7s ease; }
     @keyframes glow{
       0%{box-shadow:0 0 0 rgba(255,61,247,0)}
       55%{box-shadow:0 0 28px rgba(255,61,247,.55)}
       100%{box-shadow:0 0 0 rgba(255,61,247,0)}
     }
+
+    /* tiny spinner for loading */
+    .spin{
+      width:14px;height:14px;border-radius:50%;
+      border:2px solid rgba(255,255,255,.22);
+      border-top-color: rgba(42,245,255,.9);
+      animation: spin 0.9s linear infinite;
+      display:inline-block;
+      box-shadow: 0 0 12px rgba(42,245,255,.25);
+    }
+    @keyframes spin{ to{ transform: rotate(360deg);} }
 
     .k{color:var(--muted);font-size:.92rem}
     .mono{font-family:var(--mono)}
@@ -168,14 +229,12 @@
       color:var(--muted);
       font-size:.82rem;
       font-family:var(--mono);
+      cursor:pointer;
+      transition: .14s ease;
     }
+    .chip:hover{ transform: translateY(-1px); border-color: rgba(42,245,255,.25); color: var(--text); }
 
-    .crypto-grid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:10px;
-      margin-top:10px;
-    }
+    .crypto-grid{display:grid;grid-template-columns: 1fr;gap:10px;margin-top:10px}
     .crypto-item{
       border:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.25);
@@ -184,9 +243,7 @@
       transition:.16s ease;
     }
     .crypto-item:hover{transform:translateY(-1px); border-color:rgba(42,245,255,.25)}
-    .crypto-top{
-      display:flex;justify-content:space-between;align-items:center;gap:10px;
-    }
+    .crypto-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
     .crypto-id{font-weight:900;letter-spacing:.08em;text-transform:uppercase}
     .crypto-metrics{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
     .tag{font-family:var(--mono); font-size:.84rem; color:var(--muted)}
@@ -200,17 +257,31 @@
       max-height:210px;
       overflow:auto;
     }
-    .check{
-      display:flex;align-items:center;gap:10px;
-      padding:6px 6px;border-radius:12px;
-    }
+    .check{display:flex;align-items:center;gap:10px;padding:6px 6px;border-radius:12px}
     .check:hover{background:rgba(255,255,255,.04)}
     .check input{width:auto}
     .small{font-size:.85rem;color:var(--muted);margin-top:8px}
+
+    /* calendar panel */
+    .calendar-head{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      margin-top:10px;
+    }
+    .mini{
+      padding:8px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
+      background:rgba(3,5,18,.85);color:var(--text);outline:none;
+      font-family:var(--mono);
+      max-width:240px;
+    }
   </style>
 </head>
 
 <body>
+  <div class="blobs">
+    <div class="blob" style="left:-120px; top:-120px;"></div>
+    <div class="blob b" style="right:-160px; top:-140px;"></div>
+    <div class="blob c" style="left:20%; bottom:-180px;"></div>
+  </div>
   <div class="scanline"></div>
 
   <div class="shell">
@@ -221,7 +292,7 @@
       </div>
       <div class="right">
         <div class="status" title="État du backend (Render peut être lent au 1er appel)">
-          <span class="dot" id="dot"></span>
+          <span class="dot warn" id="dot"></span>
           <span class="mono" id="statusText">wake…</span>
         </div>
         <div class="pill" id="apiPill">API: …</div>
@@ -256,40 +327,15 @@
         <div class="row">
           <div>
             <label>Home</label>
-            <input id="home" list="teams" value="Monaco" placeholder="ex: Monaco" />
+            <input id="home" list="teams" value="AS MONACO" placeholder="ex: AS MONACO" />
           </div>
           <div>
             <label>Away</label>
-            <input id="away" list="teams" value="Lille" placeholder="ex: Lille" />
+            <input id="away" list="teams" value="LOSC LILLE" placeholder="ex: LOSC LILLE" />
           </div>
         </div>
 
-        <!-- Team datalist (Ligue 1 starter set) -->
-        <datalist id="teams">
-          <option value="Angers"></option>
-          <option value="Auxerre"></option>
-          <option value="Brest"></option>
-          <option value="Clermont"></option>
-          <option value="Le Havre"></option>
-          <option value="Lens"></option>
-          <option value="Lille"></option>
-          <option value="Lorient"></option>
-          <option value="Lyon"></option>
-          <option value="Marseille"></option>
-          <option value="Metz"></option>
-          <option value="Monaco"></option>
-          <option value="Montpellier"></option>
-          <option value="Nantes"></option>
-          <option value="Nice"></option>
-          <option value="Paris"></option>
-          <option value="PSG"></option>
-          <option value="Paris SG"></option>
-          <option value="Paris FC"></option>
-          <option value="Reims"></option>
-          <option value="Rennes"></option>
-          <option value="Strasbourg"></option>
-          <option value="Toulouse"></option>
-        </datalist>
+        <datalist id="teams"></datalist>
 
         <div class="row">
           <div>
@@ -306,18 +352,27 @@
         <input id="odd_away" value="3.60" inputmode="decimal" />
 
         <div class="btnbar">
-          <button class="btn" id="btnFoot">Calculer</button>
+          <button class="btn" id="btnFoot"><span>Calculer</span></button>
           <button class="btn secondary" id="btnSwap">Swap</button>
+          <button class="btn secondary" id="btnRandom">Roue 🎡</button>
+          <button class="btn secondary" id="btnCalendar">Calendrier 📅</button>
           <button class="btn secondary" id="btnWake">Wake API</button>
         </div>
 
         <div class="chips">
-          <div class="chip">/api/foot/predict</div>
-          <div class="chip">/api/foot/value</div>
+          <div class="chip" title="endpoint">/api/foot/predict</div>
+          <div class="chip" title="endpoint">/api/foot/value</div>
+          <div class="chip" title="endpoint">/api/foot/calendar_real</div>
         </div>
 
         <div class="result" id="footResult"></div>
-        <div class="small">Astuce : Render peut être lent au premier appel. “Wake API” réveille le backend.</div>
+
+        <!-- Calendar panel -->
+        <div class="result" id="calResult"></div>
+
+        <div class="small">
+          Astuce : Render peut être lent au premier appel. “Wake API” réveille le backend.
+        </div>
       </div>
 
       <!-- CRYPTO -->
@@ -343,7 +398,7 @@
         <div class="checklist" id="coinChecks"></div>
 
         <div class="btnbar">
-          <button class="btn" id="btnCrypto">Scanner</button>
+          <button class="btn" id="btnCrypto"><span>Scanner</span></button>
           <button class="btn secondary" id="btnSelectAll">Tout</button>
           <button class="btn secondary" id="btnSelectNone">Rien</button>
         </div>
@@ -360,7 +415,7 @@
 
   <script>
     // ==========================
-    // CONFIG (à changer une seule fois)
+    // CONFIG
     // ==========================
     const BACKEND_URL = "https://oracle-jeje-backend.onrender.com"; // <-- ton URL Render
     document.getElementById("apiPill").textContent = "API: " + BACKEND_URL;
@@ -371,13 +426,15 @@
     const dot = document.getElementById("dot");
     const statusText = document.getElementById("statusText");
     const footResult = document.getElementById("footResult");
+    const calResult = document.getElementById("calResult");
     const cryptoResult = document.getElementById("cryptoResult");
 
     function setStatus(state, text){
       statusText.textContent = text;
-      dot.classList.remove("ok","bad");
+      dot.classList.remove("ok","bad","warn");
       if(state === "ok") dot.classList.add("ok");
-      if(state === "bad") dot.classList.add("bad");
+      else if(state === "bad") dot.classList.add("bad");
+      else dot.classList.add("warn");
     }
 
     function showResult(el, html){
@@ -405,7 +462,6 @@
           clearTimeout(t);
           const isAbort = String(e).includes("AbortError");
           if(attempt < retries){
-            // small backoff
             await new Promise(r => setTimeout(r, 900));
             continue;
           }
@@ -437,25 +493,28 @@
         return false;
       }
     }
-
-    // Wake once when page loads
     wakeBackend();
-
     document.getElementById("btnWake").addEventListener("click", wakeBackend);
 
-async function loadTeams(){
-  try{
-    const league = document.getElementById("league").value.trim();
-    const url = `${BACKEND_URL}/api/foot/teams?league=${encodeURIComponent(league)}`;
-    const data = await fetchJSON(url, {timeoutMs: 15000, retries: 1});
-    const dl = document.getElementById("teams");
-    dl.innerHTML = (data.teams || []).map(t => `<option value="${t}"></option>`).join("");
-  }catch(e){
-    // si ça rate, on laisse la datalist existante
-  }
-}
-loadTeams();
-document.getElementById("league").addEventListener("change", loadTeams);
+    // ==========================
+    // Teams datalist
+    // ==========================
+    let _teamsCache = [];
+
+    async function loadTeams(){
+      try{
+        const league = document.getElementById("league").value.trim();
+        const url = `${BACKEND_URL}/api/foot/teams?league=${encodeURIComponent(league)}`;
+        const data = await fetchJSON(url, {timeoutMs: 15000, retries: 1});
+        const dl = document.getElementById("teams");
+        _teamsCache = (data.teams || []);
+        dl.innerHTML = _teamsCache.map(t => `<option value="${esc(t)}"></option>`).join("");
+      }catch(e){
+        // si ça rate, on garde ce qu'on a
+      }
+    }
+    loadTeams();
+    document.getElementById("league").addEventListener("change", loadTeams);
 
     // ==========================
     // FOOT
@@ -481,10 +540,9 @@ document.getElementById("league").addEventListener("change", loadTeams);
         return;
       }
 
-      showResult(footResult, `<div class="k">⏳ Calcul en cours… (si Render dort, ça peut prendre un moment)</div>`);
+      showResult(footResult, `<div class="k"><span class="spin"></span> Calcul en cours…</div>`);
 
       try{
-        // predict
         const pUrl = `${BACKEND_URL}/api/foot/predict?league=${encodeURIComponent(league)}&home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}`;
         const pred = await fetchJSON(pUrl, {timeoutMs: 25000, retries: 1});
         setStatus("ok", "online");
@@ -538,6 +596,103 @@ document.getElementById("league").addEventListener("change", loadTeams);
     });
 
     // ==========================
+    // FOOT - Roue match (random)
+    // ==========================
+    document.getElementById("btnRandom").addEventListener("click", async () => {
+      const league = document.getElementById("league").value.trim();
+
+      showResult(footResult, `<div class="k"><span class="spin"></span> Tirage match…</div>`);
+
+      // 1) tente endpoint backend (si tu l'as ajouté)
+      try{
+        const data = await fetchJSON(`${BACKEND_URL}/api/foot/random_match?league=${encodeURIComponent(league)}`, {timeoutMs: 15000, retries: 0});
+        if(data && data.home && data.away){
+          document.getElementById("home").value = data.home;
+          document.getElementById("away").value = data.away;
+          showResult(footResult, `<div class="k">🎡 Tirage: <b class="mono">${esc(data.home)}</b> vs <b class="mono">${esc(data.away)}</b></div>`);
+          return;
+        }
+      }catch(e){
+        // ignore -> fallback front
+      }
+
+      // 2) fallback : random depuis la liste teams chargée
+      const teams = (_teamsCache || []).slice();
+      if(teams.length < 2){
+        showResult(footResult, `<div class="bad">Pas assez d’équipes chargées. Clique “Wake API”, change de ligue puis reviens sur ligue1.</div>`);
+        return;
+      }
+      const pick = () => teams[Math.floor(Math.random() * teams.length)];
+      let home = pick(), away = pick();
+      let guard = 0;
+      while(home === away && guard < 20){ away = pick(); guard++; }
+
+      document.getElementById("home").value = home;
+      document.getElementById("away").value = away;
+      showResult(footResult, `<div class="k">🎡 Tirage (fallback): <b class="mono">${esc(home)}</b> vs <b class="mono">${esc(away)}</b></div>`);
+    });
+
+    // ==========================
+    // FOOT - Calendrier officiel
+    // ==========================
+    let _calendar = null; // { rounds: { "1": [ {date,home,away}, ...], ... } }
+
+    function renderCalendar(roundNumber){
+      if(!_calendar || !_calendar.rounds) return;
+
+      const rounds = _calendar.rounds;
+      const keys = Object.keys(rounds).map(x => parseInt(x,10)).sort((a,b)=>a-b);
+
+      const current = String(roundNumber || keys[0] || 1);
+      const matches = rounds[current] || [];
+
+      const head = `
+        <div class="calendar-head">
+          <div class="k">📅 Calendrier officiel Ligue 1 (saison)</div>
+          <select class="mini" id="roundPick">
+            ${keys.map(k => `<option value="${k}" ${String(k)===current ? "selected":""}>Journée ${k}</option>`).join("")}
+          </select>
+          <span class="k mono">(${matches.length} matchs)</span>
+        </div>
+        <div class="small">Clique un match → ça remplit Home/Away automatiquement.</div>
+      `;
+
+      const list = matches.map(m => {
+        const label = `${m.home} vs ${m.away}`;
+        return `<div class="chip" data-h="${esc(m.home)}" data-a="${esc(m.away)}">${esc(m.date)} · ${esc(label)}</div>`;
+      }).join("");
+
+      showResult(calResult, head + `<div class="chips">${list || `<div class="warn">Aucun match trouvé.</div>`}</div>`);
+
+      const pick = document.getElementById("roundPick");
+      if(pick){
+        pick.addEventListener("change", () => renderCalendar(parseInt(pick.value,10)));
+      }
+
+      calResult.querySelectorAll("[data-h]").forEach(el => {
+        el.addEventListener("click", () => {
+          document.getElementById("home").value = el.getAttribute("data-h");
+          document.getElementById("away").value = el.getAttribute("data-a");
+        });
+      });
+    }
+
+    document.getElementById("btnCalendar").addEventListener("click", async () => {
+      showResult(calResult, `<div class="k"><span class="spin"></span> Chargement calendrier…</div>`);
+      try{
+        const data = await fetchJSON(`${BACKEND_URL}/api/foot/calendar_real`, {timeoutMs: 25000, retries: 1});
+        if(data && data.error){
+          showResult(calResult, `<div class="bad">Calendrier: ${esc(data.error)}</div><div class="k mono">${esc(data.detail || "—")}</div>`);
+          return;
+        }
+        _calendar = data;
+        renderCalendar(1);
+      }catch(e){
+        showResult(calResult, `<div class="bad">Erreur calendrier</div><div class="k mono">${esc(e)}</div>`);
+      }
+    });
+
+    // ==========================
     // CRYPTO (checkboxes + filter)
     // ==========================
     const DEFAULT_COINS = [
@@ -582,13 +737,22 @@ document.getElementById("league").addEventListener("change", loadTeams);
         return;
       }
 
-      showResult(cryptoResult, `<div class="k">⏳ Scan crypto…</div>`);
+      showResult(cryptoResult, `<div class="k"><span class="spin"></span> Scan crypto…</div>`);
 
       try{
-        // On demande un peu plus pour pouvoir filtrer côté front proprement
         const url = `${BACKEND_URL}/api/crypto/scan?limit=${encodeURIComponent(30)}`;
         const data = await fetchJSON(url, {timeoutMs: 25000, retries: 1});
         setStatus("ok", "online");
+
+        // ✅ gestion propre des erreurs backend
+        if(data && data.error){
+          showResult(cryptoResult, `
+            <div class="bad">Crypto: ${esc(data.error)}</div>
+            <div class="k mono">${esc(data.detail || "—")}</div>
+            <div class="small">Cause fréquente: CoinGecko rate-limit (429) ou souci réseau. Ton backend devrait cache/fallback si tu as mis la version robuste.</div>
+          `);
+          return;
+        }
 
         const fg = data.fear_greed || {};
         let list = (data.top || [])
@@ -602,6 +766,9 @@ document.getElementById("league").addEventListener("change", loadTeams);
         }else{
           list.sort((a,b) => (b.score||0) - (a.score||0));
         }
+
+        const cachedTag = data.cached ? `<span class="warn mono">cached</span>` : `<span class="ok mono">live</span>`;
+        const warnTag = data.warning ? `<span class="warn mono">${esc(data.warning)}</span>` : "";
 
         const items = list.map(c => {
           const chg = Number(c.chg_24h || 0);
@@ -623,7 +790,7 @@ document.getElementById("league").addEventListener("change", loadTeams);
         }).join("");
 
         showResult(cryptoResult, `
-          <div class="k">Fear & Greed: <b>${esc(fg.value ?? "—")}</b> <span class="mono">(${esc(fg.value_classification ?? "—")})</span></div>
+          <div class="k">Fear & Greed: <b>${esc(fg.value ?? "—")}</b> <span class="mono">(${esc(fg.value_classification ?? "—")})</span> · ${cachedTag} ${warnTag}</div>
           <hr>
           <div class="crypto-grid">${items || `<div class="warn">Aucun résultat après filtre.</div>`}</div>
         `);
