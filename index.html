@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Oracle by Jéjè — Clean</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root{
+      --bg:#050712;
+      --panel: rgba(10, 12, 28, 0.92);
+      --border: rgba(255,255,255,0.10);
+      --text:#f4f4ff;
+      --muted:#8f9bbf;
+      --a:#ff3df7;
+      --b:#2af5ff;
+      --ok:#2afa9b;
+      --bad:#ff4b6b;
+      --r:22px;
+      --shadow: 0 18px 45px rgba(0,0,0,.65);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background: radial-gradient(circle at 0% 0%, #1a1037 0, #050712 35%, #000 100%); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+    .shell{max-width:1100px;margin:16px auto;padding:16px}
+    .header{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:14px 16px;border:1px solid var(--border);border-radius:30px;
+      background: radial-gradient(circle at 0 0, rgba(255, 61, 247, 0.12), transparent 55%),
+                  radial-gradient(circle at 100% 0, rgba(42, 245, 255, 0.14), transparent 55%),
+                  linear-gradient(135deg, rgba(10, 12, 28, 0.96), rgba(2, 4, 16, 0.98));
+      box-shadow:var(--shadow);
+    }
+    .title{
+      font-weight:900;letter-spacing:.08em;text-transform:uppercase;
+      background: linear-gradient(120deg, #ff9bf7 0%, #ffffff 30%, #2af5ff 60%, #ffef9f 100%);
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+      text-shadow:0 0 10px rgba(255,61,247,.8), 0 0 20px rgba(42,245,255,.7);
+      animation: neonPulse 2.6s ease-in-out infinite alternate;
+    }
+    @keyframes neonPulse{from{filter:drop-shadow(0 0 6px rgba(255,61,247,.5))}to{filter:drop-shadow(0 0 16px rgba(42,245,255,.8))}}
+    .sub{color:var(--muted);font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;margin-top:4px}
+    .pill{padding:6px 12px;border-radius:999px;border:1px solid var(--border);color:var(--muted);background:rgba(0,0,0,.35)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+    .card{
+      border-radius:var(--r);border:1px solid var(--border);
+      background:var(--panel);box-shadow:0 10px 30px rgba(0,0,0,.4);
+      padding:14px; position:relative; overflow:hidden;
+    }
+    .card::before{
+      content:"";position:absolute;inset:-40%;
+      background: radial-gradient(circle at 0 0, rgba(255, 61, 247, 0.09), transparent 55%);
+      pointer-events:none;
+    }
+    .card h2{font-size:.95rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+    label{display:block;color:var(--muted);font-size:.85rem;margin:8px 0 4px}
+    input{
+      width:100%;padding:10px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
+      background:rgba(3,5,18,.9);color:var(--text);outline:none;
+    }
+    input:focus{border-color:rgba(255,61,247,.8); box-shadow:0 0 0 1px rgba(42,245,255,.6)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media(max-width:600px){.row{grid-template-columns:1fr}}
+    .btn{
+      margin-top:10px;cursor:pointer;border:none;border-radius:999px;
+      padding:10px 14px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+      background: linear-gradient(120deg, #ff3df7, #ff9bf7, #2af5ff);
+      color:#050712; box-shadow:0 0 12px rgba(255,61,247,.7);
+      transition:.16s ease;
+    }
+    .btn:hover{transform:translateY(-1px); box-shadow:0 0 18px rgba(255,61,247,.9)}
+    .result{
+      margin-top:12px; padding:12px; border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.30);
+      transform: translateY(6px); opacity:0;
+      transition: .25s ease;
+    }
+    .result.show{transform:translateY(0); opacity:1}
+    /* Animation 1 : pulse glow quand on charge */
+    .glow{
+      animation: glow .6s ease;
+    }
+    @keyframes glow{
+      0%{box-shadow:0 0 0 rgba(255,61,247,0)}
+      50%{box-shadow:0 0 25px rgba(255,61,247,.55)}
+      100%{box-shadow:0 0 0 rgba(255,61,247,0)}
+    }
+    .k{color:var(--muted);font-size:.9rem}
+    .ok{color:var(--ok);font-weight:700}
+    .bad{color:var(--bad);font-weight:700}
+    .mini{font-size:.85rem;color:var(--muted);margin-top:6px}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="header">
+      <div>
+        <div class="title">Oracle by Jéjè</div>
+        <div class="sub">FOOT • CRYPTO • EDGE MACHINE</div>
+      </div>
+      <div class="pill mono" id="api-pill">API: ...</div>
+    </div>
+
+    <div class="grid">
+      <!-- FOOT -->
+      <div class="card">
+        <h2>⚽ Foot — Predict + Value</h2>
+
+        <label>Ligue (dossier data)</label>
+        <input id="league" value="ligue1" />
+
+        <div class="row">
+          <div>
+            <label>Home</label>
+            <input id="home" value="Monaco" />
+          </div>
+          <div>
+            <label>Away</label>
+            <input id="away" value="Lille" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Odd Home</label>
+            <input id="odd_home" value="2.10" />
+          </div>
+          <div>
+            <label>Odd Draw</label>
+            <input id="odd_draw" value="3.25" />
+          </div>
+        </div>
+
+        <label>Odd Away</label>
+        <input id="odd_away" value="3.60" />
+
+        <button class="btn" id="btn-foot">Calculer</button>
+
+        <div class="result" id="foot-result"></div>
+      </div>
+
+      <!-- CRYPTO -->
+      <div class="card">
+        <h2>🪙 Crypto — Scan</h2>
+
+        <label>Limit (5 à 30)</label>
+        <input id="limit" value="20" />
+
+        <button class="btn" id="btn-crypto">Scanner</button>
+
+        <div class="result" id="crypto-result"></div>
+        <div class="mini">Le score est simple pour l’instant. On upgradera RSI/MACD après.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ✅ Mets l’URL Render de ton backend ici
+    const BACKEND_URL = "https://oracle-jeje-backend.onrender.com";
+
+    const apiPill = document.getElementById("api-pill");
+    apiPill.textContent = "API: " + BACKEND_URL;
+
+    const footResult = document.getElementById("foot-result");
+    const cryptoResult = document.getElementById("crypto-result");
+
+    function showResult(el, html){
+      el.innerHTML = html;
+      el.classList.add("show");
+      el.classList.add("glow");     // Animation 1
+      setTimeout(()=> el.classList.remove("glow"), 650);
+    }
+
+    function pct(x){ return (x * 100).toFixed(1) + "%"; }
+
+    document.getElementById("btn-foot").addEventListener("click", async () => {
+      const league = document.getElementById("league").value.trim();
+      const home = document.getElementById("home").value.trim();
+      const away = document.getElementById("away").value.trim();
+      const odd_home = document.getElementById("odd_home").value.trim();
+      const odd_draw = document.getElementById("odd_draw").value.trim();
+      const odd_away = document.getElementById("odd_away").value.trim();
+
+      try{
+        // 1) Predict
+        const pUrl = `${BACKEND_URL}/api/foot/predict?league=${encodeURIComponent(league)}&home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}`;
+        const pRes = await fetch(pUrl);
+        const pred = await pRes.json();
+        if(!pRes.ok) throw new Error(JSON.stringify(pred));
+
+        // 2) Value
+        const vUrl = `${BACKEND_URL}/api/foot/value?league=${encodeURIComponent(league)}&home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}&odd_home=${encodeURIComponent(odd_home)}&odd_draw=${encodeURIComponent(odd_draw)}&odd_away=${encodeURIComponent(odd_away)}`;
+        const vRes = await fetch(vUrl);
+        const full = await vRes.json();
+        if(!vRes.ok) throw new Error(JSON.stringify(full));
+
+        const c = pred.consensus;
+        const best = full.value_bet.best;
+
+        showResult(footResult, `
+          <div class="mono"><b>${pred.home}</b> vs <b>${pred.away}</b> <span class="k">(${pred.league})</span></div>
+          <div class="k">Consensus: H ${pct(c.p_home)} · N ${pct(c.p_draw)} · A ${pct(c.p_away)}</div>
+          <div class="k">Top scores: ${pred.top_scores.map(s => `${s.score} (${(s.prob*100).toFixed(1)}%)`).slice(0,4).join(" · ")}</div>
+          <hr style="border:none;border-top:1px solid rgba(255,255,255,.10);margin:10px 0">
+          <div class="k">Best value: <span class="${best.is_value ? 'ok':'bad'}">${best.outcome.toUpperCase()}</span> — edge ${(best.edge*100).toFixed(2)}% — kelly ${(best.kelly*100).toFixed(2)}%</div>
+        `);
+
+      }catch(e){
+        showResult(footResult, `<div class="bad">Erreur foot</div><div class="k mono">${String(e)}</div>`);
+      }
+    });
+
+    document.getElementById("btn-crypto").addEventListener("click", async () => {
+      const limit = document.getElementById("limit").value.trim() || "20";
+      try{
+        const url = `${BACKEND_URL}/api/crypto/scan?limit=${encodeURIComponent(limit)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if(!res.ok) throw new Error(JSON.stringify(data));
+
+        const fg = data.fear_greed;
+        const list = data.top.map(c => `
+          <div class="k mono">
+            <b>${c.id}</b> — score ${c.score} — 24h ${c.chg_24h.toFixed(2)}%
+          </div>
+        `).join("");
+
+        showResult(cryptoResult, `
+          <div class="k">Fear & Greed: <b>${fg.value}</b> (${fg.value_classification})</div>
+          <hr style="border:none;border-top:1px solid rgba(255,255,255,.10);margin:10px 0">
+          ${list}
+        `);
+
+      }catch(e){
+        showResult(cryptoResult, `<div class="bad">Erreur crypto</div><div class="k mono">${String(e)}</div>`);
+      }
+    });
+  </script>
+</body>
+</html>
