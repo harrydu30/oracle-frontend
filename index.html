@@ -633,64 +633,96 @@
     });
 
     // ==========================
-    // FOOT - Calendrier officiel
-    // ==========================
-    let _calendar = null; // { rounds: { "1": [ {date,home,away}, ...], ... } }
+// FOOT - Calendrier officiel (ROBUSTE)
+// ==========================
+let _calendar = null; // data brute
+let _rounds = {};     // rounds normalisé: { "1": [matches], ... }
 
-    function renderCalendar(roundNumber){
-      if(!_calendar || !_calendar.rounds) return;
+function normalizeRounds(rounds){
+  // rounds peut être un objet {"1":[...]} OU une liste [[...], [...]]
+  if(Array.isArray(rounds)){
+    const obj = {};
+    rounds.forEach((matches, idx) => {
+      obj[String(idx + 1)] = matches || [];
+    });
+    return obj;
+  }
+  return rounds && typeof rounds === "object" ? rounds : {};
+}
 
-      const rounds = _calendar.rounds;
-      const keys = Object.keys(rounds).map(x => parseInt(x,10)).sort((a,b)=>a-b);
+function renderCalendar(roundNumber){
+  if(!_rounds) _rounds = {};
 
-      const current = String(roundNumber || keys[0] || 1);
-      const matches = rounds[current] || [];
+  const keys = Object.keys(_rounds)
+    .map(k => parseInt(k, 10))
+    .filter(n => Number.isFinite(n))
+    .sort((a,b)=>a-b);
 
-      const head = `
-        <div class="calendar-head">
-          <div class="k">📅 Calendrier officiel Ligue 1 (saison)</div>
-          <select class="mini" id="roundPick">
-            ${keys.map(k => `<option value="${k}" ${String(k)===current ? "selected":""}>Journée ${k}</option>`).join("")}
-          </select>
-          <span class="k mono">(${matches.length} matchs)</span>
-        </div>
-        <div class="small">Clique un match → ça remplit Home/Away automatiquement.</div>
-      `;
+  if(keys.length === 0){
+    showResult(calResult, `
+      <div class="bad">Calendrier chargé mais vide.</div>
+      <div class="k mono">rounds keys: 0</div>
+      <div class="small">Ça veut dire que ton backend ne renvoie pas de matchs (ou mauvais fichier/chemin).</div>
+    `);
+    return;
+  }
 
-      const list = matches.map(m => {
-        const label = `${m.home} vs ${m.away}`;
-        return `<div class="chip" data-h="${esc(m.home)}" data-a="${esc(m.away)}">${esc(m.date)} · ${esc(label)}</div>`;
-      }).join("");
+  const current = String(roundNumber || keys[0]);
+  const matches = _rounds[current] || _rounds[String(parseInt(current,10))] || [];
 
-      showResult(calResult, head + `<div class="chips">${list || `<div class="warn">Aucun match trouvé.</div>`}</div>`);
+  const head = `
+    <div class="calendar-head">
+      <div class="k">📅 Calendrier officiel</div>
+      <select class="mini" id="roundPick">
+        ${keys.map(k => `<option value="${k}" ${String(k)===current ? "selected":""}>Journée ${k}</option>`).join("")}
+      </select>
+      <span class="k mono">(${matches.length} matchs) · keys:${keys.length}</span>
+    </div>
+    <div class="small">Clique un match → ça remplit Home/Away.</div>
+  `;
 
-      const pick = document.getElementById("roundPick");
-      if(pick){
-        pick.addEventListener("change", () => renderCalendar(parseInt(pick.value,10)));
-      }
+  const list = matches.map(m => {
+    const d = esc(m.date || "");
+    const h = esc(m.home || "");
+    const a = esc(m.away || "");
+    return `<div class="chip" data-h="${h}" data-a="${a}">${d} · ${h} vs ${a}</div>`;
+  }).join("");
 
-      calResult.querySelectorAll("[data-h]").forEach(el => {
-        el.addEventListener("click", () => {
-          document.getElementById("home").value = el.getAttribute("data-h");
-          document.getElementById("away").value = el.getAttribute("data-a");
-        });
-      });
+  showResult(calResult, head + `<div class="chips">${list || `<div class="warn">Aucun match trouvé pour cette journée.</div>`}</div>`);
+
+  const pick = document.getElementById("roundPick");
+  if(pick){
+    pick.addEventListener("change", () => renderCalendar(parseInt(pick.value,10)));
+  }
+
+  calResult.querySelectorAll("[data-h]").forEach(el => {
+    el.addEventListener("click", () => {
+      document.getElementById("home").value = el.getAttribute("data-h");
+      document.getElementById("away").value = el.getAttribute("data-a");
+    });
+  });
+}
+
+document.getElementById("btnCalendar").addEventListener("click", async () => {
+  showResult(calResult, `<div class="k"><span class="spin"></span> Chargement calendrier…</div>`);
+  try{
+    const data = await fetchJSON(`${BACKEND_URL}/api/foot/calendar_real`, {timeoutMs: 25000, retries: 1});
+
+    // erreurs backend
+    if(data && data.error){
+      showResult(calResult, `<div class="bad">Calendrier: ${esc(data.error)}</div><div class="k mono">${esc(data.detail || "—")}</div>`);
+      return;
     }
 
-    document.getElementById("btnCalendar").addEventListener("click", async () => {
-      showResult(calResult, `<div class="k"><span class="spin"></span> Chargement calendrier…</div>`);
-      try{
-        const data = await fetchJSON(`${BACKEND_URL}/api/foot/calendar_real`, {timeoutMs: 25000, retries: 1});
-        if(data && data.error){
-          showResult(calResult, `<div class="bad">Calendrier: ${esc(data.error)}</div><div class="k mono">${esc(data.detail || "—")}</div>`);
-          return;
-        }
-        _calendar = data;
-        renderCalendar(1);
-      }catch(e){
-        showResult(calResult, `<div class="bad">Erreur calendrier</div><div class="k mono">${esc(e)}</div>`);
-      }
-    });
+    _calendar = data;
+    _rounds = normalizeRounds(data.rounds);
+
+    renderCalendar(1);
+
+  }catch(e){
+    showResult(calResult, `<div class="bad">Erreur calendrier</div><div class="k mono">${esc(e)}</div>`);
+  }
+});
 
     // ==========================
     // CRYPTO (checkboxes + filter)
