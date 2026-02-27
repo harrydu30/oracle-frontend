@@ -2,48 +2,98 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Oracle by Jéjè — Clean</title>
+  <title>Oracle by Jéjè — Pro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root{
       --bg:#050712;
-      --panel: rgba(10, 12, 28, 0.92);
+      --panel: rgba(12, 14, 30, 0.92);
       --border: rgba(255,255,255,0.10);
       --text:#f4f4ff;
-      --muted:#8f9bbf;
+      --muted:#96a2cc;
       --a:#ff3df7;
       --b:#2af5ff;
       --ok:#2afa9b;
       --bad:#ff4b6b;
+      --warn:#ffd36a;
       --r:22px;
-      --shadow: 0 18px 45px rgba(0,0,0,.65);
+      --shadow: 0 20px 55px rgba(0,0,0,.65);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     }
     *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;background: radial-gradient(circle at 0% 0%, #1a1037 0, #050712 35%, #000 100%); color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-    .shell{max-width:1100px;margin:16px auto;padding:16px}
+    html,body{height:100%}
+    body{
+      background:
+        radial-gradient(circle at 0% 0%, #1a1037 0, #050712 40%, #000 100%);
+      color:var(--text);
+      font-family:var(--sans);
+      overflow-x:hidden;
+    }
+
+    /* Subtle scanline animation (Animation #1) */
+    .scanline{
+      position:fixed; inset:0; pointer-events:none; z-index:0;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,0.03) 0px,
+          rgba(255,255,255,0.03) 1px,
+          rgba(0,0,0,0) 3px,
+          rgba(0,0,0,0) 6px
+        );
+      opacity:.14;
+      animation: scan 6.5s linear infinite;
+      mix-blend-mode: soft-light;
+    }
+    @keyframes scan{
+      0%{transform:translateY(-14px)}
+      100%{transform:translateY(14px)}
+    }
+
+    .shell{max-width:1200px;margin:16px auto;padding:16px;position:relative;z-index:1}
     .header{
       display:flex;align-items:center;justify-content:space-between;gap:12px;
       padding:14px 16px;border:1px solid var(--border);border-radius:30px;
-      background: radial-gradient(circle at 0 0, rgba(255, 61, 247, 0.12), transparent 55%),
-                  radial-gradient(circle at 100% 0, rgba(42, 245, 255, 0.14), transparent 55%),
-                  linear-gradient(135deg, rgba(10, 12, 28, 0.96), rgba(2, 4, 16, 0.98));
+      background:
+        radial-gradient(circle at 0 0, rgba(255, 61, 247, 0.12), transparent 55%),
+        radial-gradient(circle at 100% 0, rgba(42, 245, 255, 0.14), transparent 55%),
+        linear-gradient(135deg, rgba(10, 12, 28, 0.96), rgba(2, 4, 16, 0.98));
       box-shadow:var(--shadow);
     }
     .title{
-      font-weight:900;letter-spacing:.08em;text-transform:uppercase;
+      font-weight:900;letter-spacing:.10em;text-transform:uppercase;
       background: linear-gradient(120deg, #ff9bf7 0%, #ffffff 30%, #2af5ff 60%, #ffef9f 100%);
       -webkit-background-clip:text;background-clip:text;color:transparent;
       text-shadow:0 0 10px rgba(255,61,247,.8), 0 0 20px rgba(42,245,255,.7);
-      animation: neonPulse 2.6s ease-in-out infinite alternate;
     }
-    @keyframes neonPulse{from{filter:drop-shadow(0 0 6px rgba(255,61,247,.5))}to{filter:drop-shadow(0 0 16px rgba(42,245,255,.8))}}
     .sub{color:var(--muted);font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;margin-top:4px}
-    .pill{padding:6px 12px;border-radius:999px;border:1px solid var(--border);color:var(--muted);background:rgba(0,0,0,.35)}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
-    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+    .right{
+      display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end
+    }
+    .pill{
+      padding:7px 12px;border-radius:999px;border:1px solid var(--border);
+      color:var(--muted);background:rgba(0,0,0,.35);
+      font-family:var(--mono); font-size:.86rem;
+      max-width:min(520px, 70vw);
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .status{
+      padding:7px 12px;border-radius:999px;border:1px solid var(--border);
+      background:rgba(0,0,0,.35); font-size:.86rem;
+      display:flex;align-items:center;gap:8px;
+    }
+    .dot{
+      width:9px;height:9px;border-radius:50%;
+      background:var(--warn); box-shadow:0 0 12px rgba(255,211,106,.75);
+    }
+    .dot.ok{background:var(--ok); box-shadow:0 0 12px rgba(42,250,155,.7)}
+    .dot.bad{background:var(--bad); box-shadow:0 0 12px rgba(255,75,107,.7)}
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-top:14px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
     .card{
       border-radius:var(--r);border:1px solid var(--border);
-      background:var(--panel);box-shadow:0 10px 30px rgba(0,0,0,.4);
+      background:var(--panel);box-shadow:0 12px 34px rgba(0,0,0,.45);
       padding:14px; position:relative; overflow:hidden;
     }
     .card::before{
@@ -51,189 +101,530 @@
       background: radial-gradient(circle at 0 0, rgba(255, 61, 247, 0.09), transparent 55%);
       pointer-events:none;
     }
-    .card h2{font-size:.95rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+    .card h2{
+      font-size:.95rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+      margin-bottom:10px
+    }
+
     label{display:block;color:var(--muted);font-size:.85rem;margin:8px 0 4px}
-    input{
+    input, select{
       width:100%;padding:10px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
       background:rgba(3,5,18,.9);color:var(--text);outline:none;
+      font-family:var(--sans);
     }
-    input:focus{border-color:rgba(255,61,247,.8); box-shadow:0 0 0 1px rgba(42,245,255,.6)}
+    input:focus, select:focus{
+      border-color:rgba(255,61,247,.8); box-shadow:0 0 0 1px rgba(42,245,255,.6)
+    }
     .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    @media(max-width:600px){.row{grid-template-columns:1fr}}
+    @media(max-width:700px){.row{grid-template-columns:1fr}}
+
+    .btnbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
     .btn{
-      margin-top:10px;cursor:pointer;border:none;border-radius:999px;
-      padding:10px 14px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+      cursor:pointer;border:none;border-radius:999px;
+      padding:10px 14px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;
       background: linear-gradient(120deg, #ff3df7, #ff9bf7, #2af5ff);
       color:#050712; box-shadow:0 0 12px rgba(255,61,247,.7);
       transition:.16s ease;
     }
     .btn:hover{transform:translateY(-1px); box-shadow:0 0 18px rgba(255,61,247,.9)}
+    .btn.secondary{
+      background:rgba(0,0,0,.35); color:var(--text);
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:none;
+    }
+    .btn.secondary:hover{transform:translateY(-1px); box-shadow:0 0 12px rgba(42,245,255,.35)}
+
     .result{
       margin-top:12px; padding:12px; border-radius:16px;
       border:1px solid rgba(255,255,255,.10);
       background:rgba(0,0,0,.30);
-      transform: translateY(6px); opacity:0;
-      transition: .25s ease;
+      transform: translateY(8px); opacity:0;
+      transition: .26s ease;
     }
     .result.show{transform:translateY(0); opacity:1}
-    /* Animation 1 : pulse glow quand on charge */
+
+    /* Animation #2 : pulse glow on update */
     .glow{
-      animation: glow .6s ease;
+      animation: glow .7s ease;
     }
     @keyframes glow{
       0%{box-shadow:0 0 0 rgba(255,61,247,0)}
-      50%{box-shadow:0 0 25px rgba(255,61,247,.55)}
+      55%{box-shadow:0 0 28px rgba(255,61,247,.55)}
       100%{box-shadow:0 0 0 rgba(255,61,247,0)}
     }
-    .k{color:var(--muted);font-size:.9rem}
-    .ok{color:var(--ok);font-weight:700}
-    .bad{color:var(--bad);font-weight:700}
-    .mini{font-size:.85rem;color:var(--muted);margin-top:6px}
-    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;}
+
+    .k{color:var(--muted);font-size:.92rem}
+    .mono{font-family:var(--mono)}
+    .ok{color:var(--ok);font-weight:800}
+    .bad{color:var(--bad);font-weight:800}
+    .warn{color:var(--warn);font-weight:800}
+    hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:10px 0}
+
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .chip{
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.25);
+      color:var(--muted);
+      font-size:.82rem;
+      font-family:var(--mono);
+    }
+
+    .crypto-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .crypto-item{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.25);
+      border-radius:16px;
+      padding:10px;
+      transition:.16s ease;
+    }
+    .crypto-item:hover{transform:translateY(-1px); border-color:rgba(42,245,255,.25)}
+    .crypto-top{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;
+    }
+    .crypto-id{font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .crypto-metrics{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+    .tag{font-family:var(--mono); font-size:.84rem; color:var(--muted)}
+
+    .checklist{
+      margin-top:8px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.22);
+      border-radius:16px;
+      padding:10px;
+      max-height:210px;
+      overflow:auto;
+    }
+    .check{
+      display:flex;align-items:center;gap:10px;
+      padding:6px 6px;border-radius:12px;
+    }
+    .check:hover{background:rgba(255,255,255,.04)}
+    .check input{width:auto}
+    .small{font-size:.85rem;color:var(--muted);margin-top:8px}
   </style>
 </head>
+
 <body>
+  <div class="scanline"></div>
+
   <div class="shell">
     <div class="header">
       <div>
         <div class="title">Oracle by Jéjè</div>
         <div class="sub">FOOT • CRYPTO • EDGE MACHINE</div>
       </div>
-      <div class="pill mono" id="api-pill">API: ...</div>
+      <div class="right">
+        <div class="status" title="État du backend (Render peut être lent au 1er appel)">
+          <span class="dot" id="dot"></span>
+          <span class="mono" id="statusText">wake…</span>
+        </div>
+        <div class="pill" id="apiPill">API: …</div>
+      </div>
     </div>
 
     <div class="grid">
       <!-- FOOT -->
       <div class="card">
-        <h2>⚽ Foot — Predict + Value</h2>
+        <h2>⚽ Foot — Predict + Value Bet</h2>
 
-        <label>Ligue (dossier data)</label>
-        <input id="league" value="ligue1" />
+        <div class="row">
+          <div>
+            <label>Ligue</label>
+            <select id="league">
+              <option value="ligue1">ligue1</option>
+              <option value="premier_league" disabled>premier_league (bientôt)</option>
+              <option value="la_liga" disabled>la_liga (bientôt)</option>
+              <option value="serie_a" disabled>serie_a (bientôt)</option>
+              <option value="bundesliga" disabled>bundesliga (bientôt)</option>
+            </select>
+          </div>
+          <div>
+            <label>Mode</label>
+            <select id="mode">
+              <option value="predict">predict (probas)</option>
+              <option value="value">value (avec cotes)</option>
+            </select>
+          </div>
+        </div>
 
         <div class="row">
           <div>
             <label>Home</label>
-            <input id="home" value="Monaco" />
+            <input id="home" list="teams" value="Monaco" placeholder="ex: Monaco" />
           </div>
           <div>
             <label>Away</label>
-            <input id="away" value="Lille" />
+            <input id="away" list="teams" value="Lille" placeholder="ex: Lille" />
           </div>
         </div>
+
+        <!-- Team datalist (Ligue 1 starter set) -->
+        <datalist id="teams">
+          <option value="Angers"></option>
+          <option value="Auxerre"></option>
+          <option value="Brest"></option>
+          <option value="Clermont"></option>
+          <option value="Le Havre"></option>
+          <option value="Lens"></option>
+          <option value="Lille"></option>
+          <option value="Lorient"></option>
+          <option value="Lyon"></option>
+          <option value="Marseille"></option>
+          <option value="Metz"></option>
+          <option value="Monaco"></option>
+          <option value="Montpellier"></option>
+          <option value="Nantes"></option>
+          <option value="Nice"></option>
+          <option value="Paris"></option>
+          <option value="PSG"></option>
+          <option value="Paris SG"></option>
+          <option value="Paris FC"></option>
+          <option value="Reims"></option>
+          <option value="Rennes"></option>
+          <option value="Strasbourg"></option>
+          <option value="Toulouse"></option>
+        </datalist>
 
         <div class="row">
           <div>
             <label>Odd Home</label>
-            <input id="odd_home" value="2.10" />
+            <input id="odd_home" value="2.10" inputmode="decimal" />
           </div>
           <div>
             <label>Odd Draw</label>
-            <input id="odd_draw" value="3.25" />
+            <input id="odd_draw" value="3.25" inputmode="decimal" />
           </div>
         </div>
 
         <label>Odd Away</label>
-        <input id="odd_away" value="3.60" />
+        <input id="odd_away" value="3.60" inputmode="decimal" />
 
-        <button class="btn" id="btn-foot">Calculer</button>
+        <div class="btnbar">
+          <button class="btn" id="btnFoot">Calculer</button>
+          <button class="btn secondary" id="btnSwap">Swap</button>
+          <button class="btn secondary" id="btnWake">Wake API</button>
+        </div>
 
-        <div class="result" id="foot-result"></div>
+        <div class="chips">
+          <div class="chip">/api/foot/predict</div>
+          <div class="chip">/api/foot/value</div>
+        </div>
+
+        <div class="result" id="footResult"></div>
+        <div class="small">Astuce : Render peut être lent au premier appel. “Wake API” réveille le backend.</div>
       </div>
 
       <!-- CRYPTO -->
       <div class="card">
-        <h2>🪙 Crypto — Scan</h2>
+        <h2>🪙 Crypto — Scanner</h2>
 
-        <label>Limit (5 à 30)</label>
-        <input id="limit" value="20" />
+        <div class="row">
+          <div>
+            <label>Nombre max</label>
+            <input id="limit" value="20" inputmode="numeric" />
+          </div>
+          <div>
+            <label>Tri</label>
+            <select id="sort">
+              <option value="score">score</option>
+              <option value="chg">variation 24h</option>
+              <option value="id">nom</option>
+            </select>
+          </div>
+        </div>
 
-        <button class="btn" id="btn-crypto">Scanner</button>
+        <label>Sélection coins (cases)</label>
+        <div class="checklist" id="coinChecks"></div>
 
-        <div class="result" id="crypto-result"></div>
-        <div class="mini">Le score est simple pour l’instant. On upgradera RSI/MACD après.</div>
+        <div class="btnbar">
+          <button class="btn" id="btnCrypto">Scanner</button>
+          <button class="btn secondary" id="btnSelectAll">Tout</button>
+          <button class="btn secondary" id="btnSelectNone">Rien</button>
+        </div>
+
+        <div class="chips">
+          <div class="chip">/api/crypto/scan</div>
+        </div>
+
+        <div class="result" id="cryptoResult"></div>
+        <div class="small">Note : le backend renvoie un top (score simple). Ici on filtre/tri côté front pour un rendu pro.</div>
       </div>
     </div>
   </div>
 
   <script>
-    // ✅ Mets l’URL Render de ton backend ici
-    const BACKEND_URL = "https://oracle-jeje-backend.onrender.com";
+    // ==========================
+    // CONFIG (à changer une seule fois)
+    // ==========================
+    const BACKEND_URL = "https://oracle-jeje-backend.onrender.com"; // <-- ton URL Render
+    document.getElementById("apiPill").textContent = "API: " + BACKEND_URL;
 
-    const apiPill = document.getElementById("api-pill");
-    apiPill.textContent = "API: " + BACKEND_URL;
+    // ==========================
+    // Helpers UI
+    // ==========================
+    const dot = document.getElementById("dot");
+    const statusText = document.getElementById("statusText");
+    const footResult = document.getElementById("footResult");
+    const cryptoResult = document.getElementById("cryptoResult");
 
-    const footResult = document.getElementById("foot-result");
-    const cryptoResult = document.getElementById("crypto-result");
+    function setStatus(state, text){
+      statusText.textContent = text;
+      dot.classList.remove("ok","bad");
+      if(state === "ok") dot.classList.add("ok");
+      if(state === "bad") dot.classList.add("bad");
+    }
 
     function showResult(el, html){
       el.innerHTML = html;
       el.classList.add("show");
-      el.classList.add("glow");     // Animation 1
-      setTimeout(()=> el.classList.remove("glow"), 650);
+      el.classList.add("glow");
+      setTimeout(()=> el.classList.remove("glow"), 750);
     }
 
     function pct(x){ return (x * 100).toFixed(1) + "%"; }
+    function esc(s){ return String(s).replaceAll("<","&lt;").replaceAll(">","&gt;"); }
 
-    document.getElementById("btn-foot").addEventListener("click", async () => {
+    // fetch with timeout + friendly errors
+    async function fetchJSON(url, {timeoutMs=25000, retries=1} = {}){
+      for(let attempt=0; attempt<=retries; attempt++){
+        const controller = new AbortController();
+        const t = setTimeout(()=> controller.abort(), timeoutMs);
+        try{
+          const res = await fetch(url, {signal: controller.signal});
+          clearTimeout(t);
+          const data = await res.json().catch(()=> ({}));
+          if(!res.ok) throw new Error(JSON.stringify(data));
+          return data;
+        }catch(e){
+          clearTimeout(t);
+          const isAbort = String(e).includes("AbortError");
+          if(attempt < retries){
+            // small backoff
+            await new Promise(r => setTimeout(r, 900));
+            continue;
+          }
+          if(isAbort) throw new Error("timeout");
+          throw e;
+        }
+      }
+    }
+
+    // ==========================
+    // Backend wake / health
+    // ==========================
+    async function wakeBackend(){
+      setStatus("warn", "waking…");
+      try{
+        const data = await fetchJSON(`${BACKEND_URL}/health`, {timeoutMs: 25000, retries: 1});
+        if(data && data.status === "ok"){
+          setStatus("ok", "online");
+          return true;
+        }
+        setStatus("bad", "weird");
+        return false;
+      }catch(e){
+        if(String(e.message) === "timeout"){
+          setStatus("bad", "cold start");
+        }else{
+          setStatus("bad", "offline");
+        }
+        return false;
+      }
+    }
+
+    // Wake once when page loads
+    wakeBackend();
+
+    document.getElementById("btnWake").addEventListener("click", wakeBackend);
+
+    // ==========================
+    // FOOT
+    // ==========================
+    document.getElementById("btnSwap").addEventListener("click", () => {
+      const h = document.getElementById("home");
+      const a = document.getElementById("away");
+      const tmp = h.value; h.value = a.value; a.value = tmp;
+    });
+
+    document.getElementById("btnFoot").addEventListener("click", async () => {
       const league = document.getElementById("league").value.trim();
+      const mode = document.getElementById("mode").value;
       const home = document.getElementById("home").value.trim();
       const away = document.getElementById("away").value.trim();
+
       const odd_home = document.getElementById("odd_home").value.trim();
       const odd_draw = document.getElementById("odd_draw").value.trim();
       const odd_away = document.getElementById("odd_away").value.trim();
 
-      try{
-        // 1) Predict
-        const pUrl = `${BACKEND_URL}/api/foot/predict?league=${encodeURIComponent(league)}&home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}`;
-        const pRes = await fetch(pUrl);
-        const pred = await pRes.json();
-        if(!pRes.ok) throw new Error(JSON.stringify(pred));
+      if(!home || !away){
+        showResult(footResult, `<div class="bad">Home/Away manquants.</div>`);
+        return;
+      }
 
-        // 2) Value
-        const vUrl = `${BACKEND_URL}/api/foot/value?league=${encodeURIComponent(league)}&home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}&odd_home=${encodeURIComponent(odd_home)}&odd_draw=${encodeURIComponent(odd_draw)}&odd_away=${encodeURIComponent(odd_away)}`;
-        const vRes = await fetch(vUrl);
-        const full = await vRes.json();
-        if(!vRes.ok) throw new Error(JSON.stringify(full));
+      showResult(footResult, `<div class="k">⏳ Calcul en cours… (si Render dort, ça peut prendre un moment)</div>`);
+
+      try{
+        // predict
+        const pUrl = `${BACKEND_URL}/api/foot/predict?league=${encodeURIComponent(league)}&home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}`;
+        const pred = await fetchJSON(pUrl, {timeoutMs: 25000, retries: 1});
+        setStatus("ok", "online");
 
         const c = pred.consensus;
-        const best = full.value_bet.best;
+        const topScores = (pred.top_scores || [])
+          .slice(0,6)
+          .map(s => `${esc(s.score)} (${(s.prob*100).toFixed(1)}%)`)
+          .join(" · ");
+
+        let valueBlock = `<div class="k">Mode: <b>predict</b> (pas de calcul value)</div>`;
+
+        if(mode === "value"){
+          const vUrl = `${BACKEND_URL}/api/foot/value?league=${encodeURIComponent(league)}&home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}&odd_home=${encodeURIComponent(odd_home)}&odd_draw=${encodeURIComponent(odd_draw)}&odd_away=${encodeURIComponent(odd_away)}`;
+          const full = await fetchJSON(vUrl, {timeoutMs: 25000, retries: 1});
+          const best = full.value_bet?.best;
+
+          if(best){
+            valueBlock = `
+              <div class="k">Best value: <span class="${best.is_value ? 'ok':'warn'}">${esc(best.outcome).toUpperCase()}</span>
+                — edge ${(best.edge*100).toFixed(2)}%
+                — kelly ${(best.kelly*100).toFixed(2)}%
+              </div>
+              <div class="k mono">Cotes: H ${esc(odd_home)} · N ${esc(odd_draw)} · A ${esc(odd_away)}</div>
+            `;
+          }else{
+            valueBlock = `<div class="warn">Value bet non dispo (réponse backend inattendue).</div>`;
+          }
+        }
 
         showResult(footResult, `
-          <div class="mono"><b>${pred.home}</b> vs <b>${pred.away}</b> <span class="k">(${pred.league})</span></div>
-          <div class="k">Consensus: H ${pct(c.p_home)} · N ${pct(c.p_draw)} · A ${pct(c.p_away)}</div>
-          <div class="k">Top scores: ${pred.top_scores.map(s => `${s.score} (${(s.prob*100).toFixed(1)}%)`).slice(0,4).join(" · ")}</div>
-          <hr style="border:none;border-top:1px solid rgba(255,255,255,.10);margin:10px 0">
-          <div class="k">Best value: <span class="${best.is_value ? 'ok':'bad'}">${best.outcome.toUpperCase()}</span> — edge ${(best.edge*100).toFixed(2)}% — kelly ${(best.kelly*100).toFixed(2)}%</div>
+          <div class="mono"><b>${esc(pred.home)}</b> vs <b>${esc(pred.away)}</b> <span class="k">(${esc(pred.league)})</span></div>
+          <div class="k">Consensus: <b>H</b> ${pct(c.p_home)} · <b>N</b> ${pct(c.p_draw)} · <b>A</b> ${pct(c.p_away)}</div>
+          <div class="k">Top scores: ${topScores || "—"}</div>
+          <hr>
+          ${valueBlock}
         `);
 
       }catch(e){
-        showResult(footResult, `<div class="bad">Erreur foot</div><div class="k mono">${String(e)}</div>`);
+        if(String(e.message) === "timeout"){
+          setStatus("bad", "cold start");
+          showResult(footResult, `
+            <div class="bad">Backend trop long à répondre (Render cold start).</div>
+            <div class="k">Clique “Wake API”, attends 5–15s, puis relance.</div>
+          `);
+        }else{
+          setStatus("bad", "error");
+          showResult(footResult, `<div class="bad">Erreur foot</div><div class="k mono">${esc(e)}</div>`);
+        }
       }
     });
 
-    document.getElementById("btn-crypto").addEventListener("click", async () => {
-      const limit = document.getElementById("limit").value.trim() || "20";
-      try{
-        const url = `${BACKEND_URL}/api/crypto/scan?limit=${encodeURIComponent(limit)}`;
-        const res = await fetch(url);
-        const data = await res.json();
-        if(!res.ok) throw new Error(JSON.stringify(data));
+    // ==========================
+    // CRYPTO (checkboxes + filter)
+    // ==========================
+    const DEFAULT_COINS = [
+      "bitcoin","ethereum","solana","bnb","ripple",
+      "cardano","avalanche-2","chainlink","polkadot","matic-network",
+      "near","arbitrum","optimism","injective-protocol","render-token",
+      "aptos","sei-network","cosmos","the-open-network","tron"
+    ];
 
-        const fg = data.fear_greed;
-        const list = data.top.map(c => `
-          <div class="k mono">
-            <b>${c.id}</b> — score ${c.score} — 24h ${c.chg_24h.toFixed(2)}%
-          </div>
-        `).join("");
+    const coinChecks = document.getElementById("coinChecks");
+
+    function renderCoinChecks(){
+      coinChecks.innerHTML = DEFAULT_COINS.map(id => `
+        <label class="check">
+          <input type="checkbox" data-coin="${id}" checked />
+          <span class="mono">${id}</span>
+        </label>
+      `).join("");
+    }
+    renderCoinChecks();
+
+    function getSelectedCoins(){
+      const boxes = [...coinChecks.querySelectorAll("input[type=checkbox]")];
+      return boxes.filter(b => b.checked).map(b => b.getAttribute("data-coin"));
+    }
+
+    document.getElementById("btnSelectAll").addEventListener("click", () => {
+      [...coinChecks.querySelectorAll("input[type=checkbox]")].forEach(b => b.checked = true);
+    });
+    document.getElementById("btnSelectNone").addEventListener("click", () => {
+      [...coinChecks.querySelectorAll("input[type=checkbox]")].forEach(b => b.checked = false);
+    });
+
+    document.getElementById("btnCrypto").addEventListener("click", async () => {
+      const limitRaw = document.getElementById("limit").value.trim() || "20";
+      const limit = Math.max(5, Math.min(30, parseInt(limitRaw, 10) || 20));
+      const sortMode = document.getElementById("sort").value;
+      const selected = getSelectedCoins();
+
+      if(selected.length === 0){
+        showResult(cryptoResult, `<div class="bad">Aucun coin sélectionné.</div>`);
+        return;
+      }
+
+      showResult(cryptoResult, `<div class="k">⏳ Scan crypto…</div>`);
+
+      try{
+        // On demande un peu plus pour pouvoir filtrer côté front proprement
+        const url = `${BACKEND_URL}/api/crypto/scan?limit=${encodeURIComponent(30)}`;
+        const data = await fetchJSON(url, {timeoutMs: 25000, retries: 1});
+        setStatus("ok", "online");
+
+        const fg = data.fear_greed || {};
+        let list = (data.top || [])
+          .filter(c => selected.includes(c.id))
+          .slice(0, limit);
+
+        if(sortMode === "chg"){
+          list.sort((a,b) => (b.chg_24h||0) - (a.chg_24h||0));
+        }else if(sortMode === "id"){
+          list.sort((a,b) => String(a.id).localeCompare(String(b.id)));
+        }else{
+          list.sort((a,b) => (b.score||0) - (a.score||0));
+        }
+
+        const items = list.map(c => {
+          const chg = Number(c.chg_24h || 0);
+          const chgClass = chg >= 0 ? "ok" : "bad";
+          const price = (c.price_usd !== undefined && c.price_usd !== null) ? `$${Number(c.price_usd).toLocaleString("en-US", {maximumFractionDigits: 8})}` : "—";
+
+          return `
+            <div class="crypto-item">
+              <div class="crypto-top">
+                <div class="crypto-id mono">${esc(c.id)}</div>
+                <div class="tag mono">score ${esc(c.score)}</div>
+              </div>
+              <div class="crypto-metrics">
+                <div class="tag mono">prix ${price}</div>
+                <div class="tag mono ${chgClass}">24h ${chg.toFixed(2)}%</div>
+              </div>
+            </div>
+          `;
+        }).join("");
 
         showResult(cryptoResult, `
-          <div class="k">Fear & Greed: <b>${fg.value}</b> (${fg.value_classification})</div>
-          <hr style="border:none;border-top:1px solid rgba(255,255,255,.10);margin:10px 0">
-          ${list}
+          <div class="k">Fear & Greed: <b>${esc(fg.value ?? "—")}</b> <span class="mono">(${esc(fg.value_classification ?? "—")})</span></div>
+          <hr>
+          <div class="crypto-grid">${items || `<div class="warn">Aucun résultat après filtre.</div>`}</div>
         `);
 
       }catch(e){
-        showResult(cryptoResult, `<div class="bad">Erreur crypto</div><div class="k mono">${String(e)}</div>`);
+        if(String(e.message) === "timeout"){
+          setStatus("bad", "cold start");
+          showResult(cryptoResult, `
+            <div class="bad">Backend trop long à répondre (Render cold start).</div>
+            <div class="k">Clique “Wake API”, attends 5–15s, puis relance.</div>
+          `);
+        }else{
+          setStatus("bad", "error");
+          showResult(cryptoResult, `<div class="bad">Erreur crypto</div><div class="k mono">${esc(e)}</div>`);
+        }
       }
     });
   </script>
